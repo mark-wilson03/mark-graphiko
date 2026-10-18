@@ -35,7 +35,8 @@ public static class DbInitializer
         }
 
         // 2. Seed Admin User (Mark Wilson Allado)
-        string adminEmail = "admin@markgraphiko.com";
+        string adminEmail = "markwilsonquintoallado@gmail.com";
+        string adminPassword = "markwilson123";
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
         if (adminUser == null)
         {
@@ -51,7 +52,7 @@ public static class DbInitializer
                 CreatedAt = DateTime.UtcNow.AddMonths(-6)
             };
 
-            var createResult = await userManager.CreateAsync(adminUser, "Admin123!");
+            var createResult = await userManager.CreateAsync(adminUser, adminPassword);
             if (createResult.Succeeded)
             {
                 await userManager.AddToRoleAsync(adminUser, "Admin");
@@ -59,9 +60,21 @@ public static class DbInitializer
         }
         else
         {
-            // Update to official name & avatar
+            // Ensure password is set to requested markwilson123
+            if (await userManager.HasPasswordAsync(adminUser))
+            {
+                await userManager.RemovePasswordAsync(adminUser);
+            }
+            await userManager.AddPasswordAsync(adminUser, adminPassword);
+
+            if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
+            {
+                await userManager.AddToRoleAsync(adminUser, "Admin");
+            }
+
             adminUser.FullName = "Mark Wilson Allado";
             adminUser.AvatarUrl = "/images/mark-profile.jpg";
+            adminUser.EmailConfirmed = true;
             await userManager.UpdateAsync(adminUser);
         }
 
@@ -153,5 +166,80 @@ public static class DbInitializer
             context.DesignPosts.Add(mgLogo);
             await context.SaveChangesAsync();
         }
+
+        // 6. Seed Additional Featured Portfolio Works for Full Carousel Showcase
+        var jerseyDesign = await context.DesignPosts.FirstOrDefaultAsync(d => d.Title.Contains("NEON APEX MOTORSPORTS"));
+        if (jerseyDesign == null)
+        {
+            context.DesignPosts.Add(new DesignPost
+            {
+                Title = "NEON APEX MOTORSPORTS | Full-Sublimation Racing Jersey",
+                Description = "Dynamic esports and motorsports team jersey featuring angular neon cyan and blazing orange kinetic vector elements, contrast trim collar, and aerodynamic team sponsor layout.",
+                CategoryId = catTShirt.Id,
+                ImagePath = "/images/neon-apex-jersey.jpg",
+                Client = "Neon Apex Racing Team",
+                ToolsUsed = "Adobe Photoshop, Illustrator",
+                Tags = "sublimation, jersey, motorsports, racing, apparel, neon",
+                IsFeatured = true,
+                ViewCount = 5240,
+                CreatedAt = DateTime.UtcNow.AddDays(-2)
+            });
+        }
+
+        var samuraiDesign = await context.DesignPosts.FirstOrDefaultAsync(d => d.Title.Contains("CYBERPUNK ONI SAMURAI"));
+        if (samuraiDesign == null)
+        {
+            context.DesignPosts.Add(new DesignPost
+            {
+                Title = "CYBERPUNK ONI SAMURAI | Vector Character Illustration",
+                Description = "Master vector illustration blending traditional Japanese samurai armor with cybernetic visor tech, glowing neon katana blade, and intricate apparel decals.",
+                CategoryId = catVector.Id,
+                ImagePath = "/images/cyberpunk-oni-samurai.jpg",
+                Client = "Rebel Studio Tokyo",
+                ToolsUsed = "Adobe Illustrator",
+                Tags = "vector-art, cyberpunk, samurai, oni, illustration, streetwear",
+                IsFeatured = true,
+                ViewCount = 6180,
+                CreatedAt = DateTime.UtcNow.AddDays(-3)
+            });
+        }
+
+        var valkyrieDesign = await context.DesignPosts.FirstOrDefaultAsync(d => d.Title.Contains("VALKYRIE ATHLETIC EXCELLENCE"));
+        if (valkyrieDesign == null)
+        {
+            context.DesignPosts.Add(new DesignPost
+            {
+                Title = "VALKYRIE ATHLETIC EXCELLENCE | Custom Team Polo",
+                Description = "High-performance collegiate athletic polo shirt engineered with interlocking gold and navy blue polygonal geometric vectors, button placket, and crest embroidery detailing.",
+                CategoryId = catTShirt.Id,
+                ImagePath = "/images/valkyrie-athletic-polo.jpg",
+                Client = "Valkyrie Athletics League",
+                ToolsUsed = "Adobe Photoshop, Illustrator",
+                Tags = "polo-shirt, sublimation, athletic, apparel, geometric, luxury",
+                IsFeatured = true,
+                ViewCount = 4890,
+                CreatedAt = DateTime.UtcNow.AddDays(-4)
+            });
+        }
+
+        var brutalistDesign = await context.DesignPosts.FirstOrDefaultAsync(d => d.Title.Contains("BRUTALIST ARCHITECT"));
+        if (brutalistDesign == null)
+        {
+            context.DesignPosts.Add(new DesignPost
+            {
+                Title = "BRUTALIST ARCHITECT | Streetwear Collective Poster",
+                Description = "Experimental brutalist typography and oversized apparel poster print showcasing distressed textures, warped gothic typefaces, and industrial urban architecture motifs.",
+                CategoryId = catBranding.Id,
+                ImagePath = "/images/brutalist-streetwear-poster.jpg",
+                Client = "Urban Decay Collective",
+                ToolsUsed = "Adobe Photoshop, InDesign",
+                Tags = "typography, brutalist, streetwear, poster, branding, raw-type",
+                IsFeatured = true,
+                ViewCount = 3940,
+                CreatedAt = DateTime.UtcNow.AddDays(-5)
+            });
+        }
+
+        await context.SaveChangesAsync();
     }
 }

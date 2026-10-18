@@ -55,9 +55,9 @@ function initCarousel(carouselId) {
 
     const track = container.querySelector('.carousel-track');
     const slides = container.querySelectorAll('.carousel-slide');
-    const prevBtn = container.querySelector('.carousel-prev');
-    const nextBtn = container.querySelector('.carousel-next');
-    const dotsContainer = container.querySelector('.carousel-dots');
+    const prevBtn = document.getElementById('carouselPrevBtn') || container.querySelector('.carousel-prev') || document.querySelector('.carousel-prev');
+    const nextBtn = document.getElementById('carouselNextBtn') || container.querySelector('.carousel-next') || document.querySelector('.carousel-next');
+    const dotsContainer = document.getElementById('carouselDots') || container.querySelector('.carousel-dots') || document.querySelector('.carousel-dots');
 
     if (!track || slides.length === 0) return;
 
@@ -83,9 +83,13 @@ function initCarousel(carouselId) {
         const count = maxIndex() + 1;
         for (let i = 0; i < count; i++) {
             const dot = document.createElement('button');
-            dot.className = `w-2.5 h-2.5 rounded-full transition-all duration-300 ${i === currentIndex ? 'bg-indigo-500 w-8' : 'bg-slate-400/40 dark:bg-slate-700 hover:bg-slate-500'}`;
+            dot.type = 'button';
+            dot.className = `w-2.5 h-2.5 rounded-full transition-all duration-300 cursor-pointer ${i === currentIndex ? 'bg-amber-500 w-8' : 'bg-slate-400/40 dark:bg-slate-700 hover:bg-slate-500'}`;
             dot.setAttribute('aria-label', `Slide ${i + 1}`);
-            dot.addEventListener('click', () => goToSlide(i));
+            dot.addEventListener('click', (e) => {
+                e.preventDefault();
+                goToSlide(i);
+            });
             dotsContainer.appendChild(dot);
         }
     }
@@ -95,16 +99,17 @@ function initCarousel(carouselId) {
         const dots = dotsContainer.querySelectorAll('button');
         dots.forEach((dot, idx) => {
             if (idx === currentIndex) {
-                dot.className = 'w-8 h-2.5 rounded-full bg-indigo-500 transition-all duration-300';
+                dot.className = 'w-8 h-2.5 rounded-full bg-amber-500 transition-all duration-300 cursor-pointer';
             } else {
-                dot.className = 'w-2.5 h-2.5 rounded-full bg-slate-400/40 dark:bg-slate-700 hover:bg-slate-500 transition-all duration-300';
+                dot.className = 'w-2.5 h-2.5 rounded-full bg-slate-400/40 dark:bg-slate-700 hover:bg-slate-500 transition-all duration-300 cursor-pointer';
             }
         });
     }
 
     function updateTrackPosition() {
-        const slideWidthPercent = 100 / getVisibleSlidesCount();
-        track.style.transform = `translateX(-${currentIndex * slideWidthPercent}%)`;
+        if (!slides.length) return;
+        const slideWidth = slides[0].getBoundingClientRect().width;
+        track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
         updateDots();
     }
 
@@ -164,8 +169,23 @@ function initCarousel(carouselId) {
         startAutoPlay();
     });
 
-    if (prevBtn) prevBtn.addEventListener('click', () => { stopAutoPlay(); prevSlide(); startAutoPlay(); });
-    if (nextBtn) nextBtn.addEventListener('click', () => { stopAutoPlay(); nextSlide(); startAutoPlay(); });
+    if (prevBtn) {
+        prevBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            stopAutoPlay();
+            prevSlide();
+            startAutoPlay();
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            stopAutoPlay();
+            nextSlide();
+            startAutoPlay();
+        });
+    }
 
     container.addEventListener('mouseenter', stopAutoPlay);
     container.addEventListener('mouseleave', startAutoPlay);
@@ -179,6 +199,10 @@ function initCarousel(carouselId) {
     createDots();
     updateTrackPosition();
     startAutoPlay();
+
+    // Export global helpers
+    window.carouselPrev = () => { stopAutoPlay(); prevSlide(); startAutoPlay(); };
+    window.carouselNext = () => { stopAutoPlay(); nextSlide(); startAutoPlay(); };
 }
 
 // 4. HIGH-RESOLUTION MODAL HANDLER
