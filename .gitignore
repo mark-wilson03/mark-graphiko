@@ -1,0 +1,26 @@
+## Visual Studio / .NET Core
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Database & temporary SQLite journal files
+*.db-shm
+*.db-wal
+
+## OS & Editor artifacts
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+.idea/
+.vscode/
+
+## Uploaded user files (optional exclusion for clean deployment)
+# wwwroot/uploads/

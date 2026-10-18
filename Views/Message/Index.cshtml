@@ -1,0 +1,176 @@
+@model MarkGraphiko.Models.ViewModels.MessageInputModel
+@using Microsoft.AspNetCore.Identity
+@using MarkGraphiko.Models
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    ViewData["Title"] = "Client Inquiry & Commission Brief | Mark Graphiko";
+    var isAuthenticated = SignInManager.IsSignedIn(User);
+}
+
+<div class="max-w-5xl mx-auto px-6 py-12 md:py-20">
+    
+    <div class="text-center max-w-2xl mx-auto mb-14">
+        <span class="text-xs font-mono font-bold uppercase tracking-widest text-amber-500 block mb-2">Direct Engagement</span>
+        <h1 class="text-3xl sm:text-5xl font-black uppercase text-slate-900 dark:text-white tracking-tight">
+            START A PROJECT INQUIRY
+        </h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-3 leading-relaxed">
+            Collaborate directly with Mark Wilson Allado for custom sports &amp; club sublimation uniforms, streetwear mockups, and logos.
+        </p>
+    </div>
+
+    @if (!isAuthenticated)
+    {
+        <!-- CLIENT AUTHENTICATION ENGAGEMENT WALL -->
+        <div class="max-w-xl mx-auto rounded-3xl p-8 sm:p-12 glass-panel border border-amber-500/30 text-center relative overflow-hidden shadow-2xl">
+            <!-- Background Radial Glow -->
+            <div class="absolute -top-24 -left-24 w-48 h-48 bg-amber-500/20 blur-3xl rounded-full pointer-events-none"></div>
+            <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-indigo-500/20 blur-3xl rounded-full pointer-events-none"></div>
+
+            <img src="~/images/mark-graphiko-logo.png" alt="MARK GRAPHIKO" class="h-16 w-auto mx-auto object-contain rounded-xl shadow-lg mb-4" />
+
+            <span class="inline-block px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-wider font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20 mb-3">
+                Security &amp; Client Verification
+            </span>
+
+            <h2 class="text-2xl font-black uppercase text-slate-900 dark:text-white mb-2">
+                Connect to Send Your Inquiry
+            </h2>
+
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-8">
+                To prevent spam and allow real-time tracking of quotes and production updates, please sign in with Google, Facebook, or your mobile number / email.
+            </p>
+
+            <!-- Social Authentication Buttons -->
+            <div class="flex flex-col gap-3 mb-6">
+                <!-- Google Sign In -->
+                <form asp-controller="Account" asp-action="ExternalLogin" asp-route-returnUrl="/Message" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="provider" value="Google" />
+                    <button type="submit" class="w-full py-3.5 px-4 rounded-xl flex items-center justify-center gap-3 bg-white dark:bg-slate-800 border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-200 text-xs font-bold uppercase tracking-wider hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-indigo-500 transition-all shadow-sm">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                        </svg>
+                        Continue with Google
+                    </button>
+                </form>
+
+                <!-- Facebook Sign In -->
+                <form asp-controller="Account" asp-action="ExternalLogin" asp-route-returnUrl="/Message" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="provider" value="Facebook" />
+                    <button type="submit" class="w-full py-3.5 px-4 rounded-xl flex items-center justify-center gap-3 bg-[#1877F2] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#166fe5] transition-all shadow-sm">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                        Continue with Facebook
+                    </button>
+                </form>
+
+                <!-- Email or Number Sign In / Register -->
+                <div class="relative my-2">
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-300 dark:border-white/10"></div></div>
+                    <div class="relative flex justify-center text-[10px] uppercase font-mono"><span class="px-2 bg-slate-50 dark:bg-[#0f172a] text-slate-400">or sign in with email / phone</span></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Message" class="py-3 px-4 rounded-xl text-center text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white glass-panel hover:border-amber-500 transition-colors">
+                        Sign In
+                    </a>
+                    <a asp-controller="Account" asp-action="Register" asp-route-returnUrl="/Message" class="py-3 px-4 rounded-xl text-center text-xs font-bold uppercase tracking-wider text-white bg-indigo-600 hover:bg-indigo-500 transition-colors shadow-lg shadow-indigo-600/20">
+                        Register
+                    </a>
+                </div>
+            </div>
+
+            <p class="text-[11px] text-slate-400">
+                An automated confirmation email will be dispatched to your account immediately upon authentication.
+            </p>
+        </div>
+    }
+    else
+    {
+        <!-- AUTHENTICATED CLIENT INQUIRY FORM -->
+        <div class="max-w-2xl mx-auto rounded-3xl p-8 sm:p-12 glass-panel shadow-2xl">
+            <div class="flex items-center gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-500 dark:text-amber-400 text-xs mb-8">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span>Verified Client: <strong>@Model.SenderName</strong> (@Model.SenderEmail). Direct quotes &amp; mockups will be dispatched to your account.</span>
+            </div>
+
+            <form asp-controller="Message" asp-action="Send" method="post" class="space-y-6">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="DesignReferenceId" />
+                <input type="hidden" asp-for="SenderName" />
+                <input type="hidden" asp-for="SenderEmail" />
+
+                <!-- Project Type & Estimated Budget Row -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label asp-for="ProjectType" class="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
+                            Project Type *
+                        </label>
+                        <select asp-for="ProjectType" class="w-full px-4 py-3 rounded-xl glass-panel text-slate-900 dark:text-white bg-transparent border border-slate-300 dark:border-white/10 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <option value="Full Sublimation Polo Uniform" class="dark:bg-slate-900">Full Sublimation Polo / Sports Uniform</option>
+                            <option value="T-Shirt Mockup &amp; Apparel" class="dark:bg-slate-900">T-Shirt Mockup &amp; Streetwear Apparel</option>
+                            <option value="Logo &amp; Brand Kit" class="dark:bg-slate-900">Logo &amp; Brand Kit</option>
+                            <option value="Vector Art &amp; Illustration" class="dark:bg-slate-900">Vector Art &amp; Illustration</option>
+                            <option value="Branding &amp; Packaging" class="dark:bg-slate-900">Branding &amp; Packaging</option>
+                            <option value="Other / Full Retainer" class="dark:bg-slate-900">Other / Retainer</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label asp-for="BudgetRange" class="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
+                            Estimated Budget *
+                        </label>
+                        <select asp-for="BudgetRange" class="w-full px-4 py-3 rounded-xl glass-panel text-slate-900 dark:text-white bg-transparent border border-slate-300 dark:border-white/10 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <option value="$100 - $300" class="dark:bg-slate-900">$100 - $300 (Single Mockup/Design)</option>
+                            <option value="$300 - $600" class="dark:bg-slate-900">$300 - $600 (Uniform Set / 2-3 Graphics)</option>
+                            <option value="$600 - $1,200" class="dark:bg-slate-900">$600 - $1,200 (Full Brand Kit or Team Uniforms)</option>
+                            <option value="$1,200+" class="dark:bg-slate-900">$1,200+ (Bulk Uniform Production / Enterprise)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Subject Line -->
+                <div>
+                    <label asp-for="Subject" class="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
+                        Subject Line *
+                    </label>
+                    <input asp-for="Subject" placeholder="e.g. Science Club Sublimation Polo Uniforms - 45 Sets"
+                           class="w-full px-4 py-3 rounded-xl glass-panel text-slate-900 dark:text-white placeholder-slate-400 border border-slate-300 dark:border-white/10 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                    <span asp-validation-for="Subject" class="text-[11px] text-rose-500 block mt-1"></span>
+                </div>
+
+                <!-- Phone (Optional) -->
+                <div>
+                    <label asp-for="PhoneNumber" class="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
+                        WhatsApp / Contact Phone (Optional)
+                    </label>
+                    <input asp-for="PhoneNumber" placeholder="+63 912 345 6789"
+                           class="w-full px-4 py-3 rounded-xl glass-panel text-slate-900 dark:text-white placeholder-slate-400 border border-slate-300 dark:border-white/10 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                </div>
+
+                <!-- Project Content / Brief -->
+                <div>
+                    <label asp-for="Content" class="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
+                        Project Brief &amp; Specifications *
+                    </label>
+                    <textarea asp-for="Content" rows="6" placeholder="Describe your uniform specifications, preferred colors (e.g. purple, black, white), logos or emblems to include, target delivery timeline, or any specific visual references..."
+                              class="w-full px-4 py-3 rounded-xl glass-panel text-slate-900 dark:text-white placeholder-slate-400 border border-slate-300 dark:border-white/10 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none leading-relaxed"></textarea>
+                    <span asp-validation-for="Content" class="text-[11px] text-rose-500 block mt-1"></span>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="w-full py-4 text-center text-xs font-bold uppercase tracking-wider text-white bg-gradient-to-r from-amber-500 via-indigo-600 to-cyan-500 rounded-xl hover:shadow-xl hover:shadow-amber-500/25 hover:scale-[1.01] transition-all duration-300">
+                    Dispatch Project Brief to Mark Graphiko &rarr;
+                </button>
+            </form>
+        </div>
+    }
+
+</div>

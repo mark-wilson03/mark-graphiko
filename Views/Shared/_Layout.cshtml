@@ -1,0 +1,382 @@
+@using Microsoft.AspNetCore.Identity
+@using MarkGraphiko.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    var currentUser = SignInManager.IsSignedIn(User) ? await UserManager.GetUserAsync(User) : null;
+    var isAdmin = currentUser != null && await UserManager.IsInRoleAsync(currentUser, "Admin");
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+}
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@(ViewData["Title"] != null ? $"{ViewData["Title"]} - " : "")MARK GRAPHIKO | Where Art Meets Design</title>
+    <meta name="description" content="MARK GRAPHIKO - Official portfolio & client engagement platform for graphic design, sportswear sublimation mockups, brand logos, and vector illustrations." />
+    <link rel="icon" type="image/png" href="~/images/mark-graphiko-logo.png" />
+
+    <!-- Tailwind CSS CDN with class-based Dark Mode -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#080c14',
+                        darkCard: '#0f172a',
+                        darkBorder: 'rgba(255, 255, 255, 0.08)',
+                        brandPurple: '#6366f1',
+                        brandCyan: '#06b6d4'
+                    },
+                    fontFamily: {
+                        outfit: ['Outfit', 'sans-serif'],
+                        mono: ['Space Grotesk', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom Theme & Micro-interaction CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="cyber-grid text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-[#080c14] min-h-screen flex flex-col pb-20 md:pb-0">
+
+    <!-- DESKTOP TOP NAVIGATION BAR (Fixed at TOP for desktop >= md) -->
+    <header class="hidden md:block fixed top-0 left-0 right-0 z-50 glass-nav border-b border-slate-200/80 dark:border-white/10 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <!-- Brand Logo using User's Image -->
+            <a asp-controller="Home" asp-action="Index" class="flex items-center gap-3 group">
+                <img src="~/images/mark-graphiko-logo.png" alt="MARK GRAPHIKO" class="h-12 w-auto object-contain rounded-lg shadow-md group-hover:scale-105 transition-transform duration-300" />
+                <div>
+                    <span class="text-lg font-black tracking-wider uppercase gradient-text">MARK GRAPHIKO</span>
+                    <span class="block text-[10px] tracking-widest text-amber-500 font-mono uppercase font-bold">Where Art Meets Design</span>
+                </div>
+            </a>
+
+            <!-- Desktop Nav Links -->
+            <nav class="flex items-center gap-1 lg:gap-2">
+                <a asp-controller="Home" asp-action="Index" class="px-4 py-2 text-sm font-semibold tracking-wide rounded-lg transition-colors @(currentController == "Home" && currentAction == "Index" ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40" : "text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400")">
+                    HOME
+                </a>
+                <a asp-controller="Home" asp-action="About" class="px-4 py-2 text-sm font-semibold tracking-wide rounded-lg transition-colors @(currentController == "Home" && currentAction == "About" ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40" : "text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400")">
+                    ABOUT
+                </a>
+                <a asp-controller="Designs" asp-action="Index" class="px-4 py-2 text-sm font-semibold tracking-wide rounded-lg transition-colors @(currentController == "Designs" ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40" : "text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400")">
+                    DESIGNS
+                </a>
+                <a asp-controller="Message" asp-action="Index" class="px-4 py-2 text-sm font-semibold tracking-wide rounded-lg transition-colors @(currentController == "Message" ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40" : "text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400")">
+                    MESSAGE
+                </a>
+
+                @if (isAdmin)
+                {
+                    <a asp-controller="Admin" asp-action="Upload" class="px-4 py-2 text-sm font-semibold tracking-wide rounded-lg transition-colors @(currentController == "Admin" && currentAction == "Upload" ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40" : "text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400")">
+                        UPLOAD
+                    </a>
+                    <a asp-controller="Admin" asp-action="Messages" class="px-4 py-2 text-sm font-semibold tracking-wide rounded-lg transition-colors @(currentController == "Admin" && currentAction == "Messages" ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40" : "text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400")">
+                        INBOX
+                    </a>
+                    <a asp-controller="Admin" asp-action="Index" class="px-3 py-1.5 text-xs font-bold tracking-wider rounded-md uppercase bg-amber-500/10 text-amber-500 border border-amber-500/30 hover:bg-amber-500/20 transition-all">
+                        DASHBOARD
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Profile" asp-action="Index" class="px-4 py-2 text-sm font-semibold tracking-wide rounded-lg transition-colors @(currentController == "Profile" ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40" : "text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400")">
+                        PROFILE
+                    </a>
+                }
+            </nav>
+
+            <!-- Actions (Theme Toggle & User Session) -->
+            <div class="flex items-center gap-4">
+                <!-- Theme Toggle Button -->
+                <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-slate-200/80 dark:bg-slate-800/80 border border-slate-300 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-indigo-500 transition-colors" title="Toggle Light/Dark Theme" aria-label="Toggle Theme">
+                    <svg class="theme-sun-icon w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    <svg class="theme-moon-icon w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                </button>
+
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <div class="flex items-center gap-3">
+                        <a asp-controller="Profile" asp-action="Index" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-300 dark:border-white/10 hover:border-indigo-500 transition-all">
+                            @if (!string.IsNullOrEmpty(currentUser?.AvatarUrl))
+                            {
+                                <img src="@currentUser.AvatarUrl" alt="@currentUser.FullName" class="w-7 h-7 rounded-lg object-cover border border-indigo-500/30" />
+                            }
+                            else if (isAdmin)
+                            {
+                                <img src="~/images/mark-profile.jpg" alt="Mark Wilson Allado" class="w-7 h-7 rounded-lg object-cover" />
+                            }
+                            else
+                            {
+                                <span class="w-7 h-7 rounded-lg bg-indigo-600 text-white font-bold text-xs flex items-center justify-center">
+                                    @(currentUser?.FullName?.Substring(0, 1) ?? "U")
+                                </span>
+                            }
+                            <span class="text-xs font-semibold text-slate-700 dark:text-slate-200">
+                                @(currentUser?.FullName?.Split(' ')[0] ?? "Account")
+                            </span>
+                        </a>
+
+                        <button type="button" onclick="openLogoutModal()" class="p-2 text-xs text-slate-400 hover:text-rose-500 transition-colors" title="Sign Out">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                            </svg>
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login" class="px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-gradient-to-r from-indigo-600 to-cyan-500 rounded-xl hover:shadow-lg hover:shadow-indigo-500/30 hover:scale-[1.02] transition-all duration-300">
+                        Sign In / Register
+                    </a>
+                }
+            </div>
+        </div>
+    </header>
+
+    <!-- MOBILE TOP BAR (Minimal Header on Mobile with Brand & Theme Toggle) -->
+    <header class="md:hidden glass-nav sticky top-0 z-40 px-5 py-3 border-b border-slate-200/80 dark:border-white/10 flex items-center justify-between">
+        <a asp-controller="Home" asp-action="Index" class="flex items-center gap-2.5">
+            <img src="~/images/mark-graphiko-logo.png" alt="MARK GRAPHIKO" class="h-8 w-auto object-contain rounded-md" />
+            <div>
+                <span class="font-black text-xs tracking-wider uppercase gradient-text block">MARK GRAPHIKO</span>
+                <span class="text-[9px] text-amber-500 font-mono font-bold uppercase leading-none">Where Art Meets Design</span>
+            </div>
+        </a>
+        <div class="flex items-center gap-2">
+            <button onclick="toggleTheme()" class="w-8 h-8 rounded-lg bg-slate-200/80 dark:bg-slate-800/80 flex items-center justify-center text-slate-700 dark:text-slate-300" aria-label="Toggle Theme">
+                <svg class="theme-sun-icon w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <svg class="theme-moon-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                </svg>
+            </button>
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <button type="button" onclick="openLogoutModal()" class="p-1.5 text-slate-400 hover:text-rose-500" title="Sign Out">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                </button>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login" class="text-xs font-bold text-indigo-500 px-2.5 py-1 rounded-md bg-indigo-500/10">
+                    Sign In
+                </a>
+            }
+        </div>
+    </header>
+
+    <!-- TOAST NOTIFICATIONS (Success / Error / Info) -->
+    <div class="fixed top-24 right-5 z-50 flex flex-col gap-3 max-w-sm pointer-events-none">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="toast-alert pointer-events-auto flex items-start gap-3 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 backdrop-blur-md shadow-2xl">
+                <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div class="text-xs font-medium">@TempData["SuccessMessage"]</div>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="toast-alert pointer-events-auto flex items-start gap-3 p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 backdrop-blur-md shadow-2xl">
+                <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div class="text-xs font-medium">@TempData["ErrorMessage"]</div>
+            </div>
+        }
+    </div>
+
+    <!-- MAIN PAGE CONTENT (Offset top on desktop for fixed header) -->
+    <main class="flex-grow md:pt-20">
+        @RenderBody()
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-20 border-t border-slate-200 dark:border-white/10 bg-slate-100/50 dark:bg-black/40 py-12 text-slate-500 dark:text-slate-400 text-xs">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="md:col-span-2">
+                <div class="flex items-center gap-3 mb-3">
+                    <img src="~/images/mark-graphiko-logo.png" alt="MARK GRAPHIKO" class="h-10 w-auto object-contain rounded-lg" />
+                    <div>
+                        <span class="font-black text-sm tracking-wider uppercase text-slate-800 dark:text-white">MARK GRAPHIKO</span>
+                        <span class="block text-[10px] text-amber-500 font-mono font-bold uppercase">Where Art Meets Design</span>
+                    </div>
+                </div>
+                <p class="max-w-md text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Official creative studio of Mark Wilson Allado. Elevating brands through precision artwork &amp; club uniforms, apparel mockups, and distinctive brand identities.
+                </p>
+            </div>
+            <div>
+                <h4 class="font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-3">Quick Navigation</h4>
+                <ul class="space-y-2">
+                    <li><a asp-controller="Home" asp-action="Index" class="hover:text-indigo-500 transition-colors">Home</a></li>
+                    <li><a asp-controller="Home" asp-action="About" class="hover:text-indigo-500 transition-colors">About &amp; Skills</a></li>
+                    <li><a asp-controller="Designs" asp-action="Index" class="hover:text-indigo-500 transition-colors">Design Gallery</a></li>
+                    <li><a asp-controller="Message" asp-action="Index" class="hover:text-indigo-500 transition-colors">Client Inquiry</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-3">Direct Contact</h4>
+                <p class="mb-2">markwilsonquintoallado@gmail.com</p>
+                <p class="mb-3">Open for freelance commissions, uniform designs &amp; brand merchandise.</p>
+                <div class="text-[11px] text-slate-400">&copy; @DateTime.UtcNow.Year MARK GRAPHIKO &bull; Created by Mark Wilson Allado. All rights reserved.</div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- TABLET & MOBILE BOTTOM NAVIGATION (App-like Mobile Navigation shifts to BOTTOM) -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-nav border-t border-slate-200/80 dark:border-white/10 px-2 py-2 safe-area-pb">
+        <div class="flex items-center justify-around">
+            <!-- Home -->
+            <a asp-controller="Home" asp-action="Index" class="flex flex-col items-center gap-1 p-2 rounded-xl transition-colors @(currentController == "Home" && currentAction == "Index" ? "text-indigo-600 dark:text-indigo-400" : "text-slate-500 dark:text-slate-400")">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <span class="text-[10px] font-bold tracking-wider uppercase">Home</span>
+            </a>
+
+            <!-- About -->
+            <a asp-controller="Home" asp-action="About" class="flex flex-col items-center gap-1 p-2 rounded-xl transition-colors @(currentController == "Home" && currentAction == "About" ? "text-indigo-600 dark:text-indigo-400" : "text-slate-500 dark:text-slate-400")">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                <span class="text-[10px] font-bold tracking-wider uppercase">About</span>
+            </a>
+
+            <!-- Designs -->
+            <a asp-controller="Designs" asp-action="Index" class="flex flex-col items-center gap-1 p-2 rounded-xl transition-colors @(currentController == "Designs" ? "text-indigo-600 dark:text-indigo-400" : "text-slate-500 dark:text-slate-400")">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <span class="text-[10px] font-bold tracking-wider uppercase">Designs</span>
+            </a>
+
+            <!-- Message / Inquiry -->
+            <a asp-controller="Message" asp-action="Index" class="flex flex-col items-center gap-1 p-2 rounded-xl transition-colors @(currentController == "Message" ? "text-indigo-600 dark:text-indigo-400" : "text-slate-500 dark:text-slate-400")">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                <span class="text-[10px] font-bold tracking-wider uppercase">Message</span>
+            </a>
+
+            <!-- Profile or Admin -->
+            @if (isAdmin)
+            {
+                <a asp-controller="Admin" asp-action="Index" class="flex flex-col items-center gap-1 p-2 rounded-xl transition-colors @(currentController == "Admin" ? "text-amber-500" : "text-slate-500 dark:text-slate-400")">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <span class="text-[10px] font-bold tracking-wider uppercase">Admin</span>
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Profile" asp-action="Index" class="flex flex-col items-center gap-1 p-2 rounded-xl transition-colors @(currentController == "Profile" ? "text-indigo-600 dark:text-indigo-400" : "text-slate-500 dark:text-slate-400")">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span class="text-[10px] font-bold tracking-wider uppercase">Profile</span>
+                </a>
+            }
+        </div>
+    </nav>
+
+    <!-- HIGH-RESOLUTION ARTWORK DETAIL MODAL -->
+    <div id="designModal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modalTitle" role="dialog" aria-modal="true">
+        <!-- Backdrop Blur -->
+        <div class="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity" onclick="closeDesignModal()"></div>
+
+        <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-4xl">
+                <!-- Close Button -->
+                <button onclick="closeDesignModal()" class="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/50 text-white hover:bg-black/80 transition-colors" aria-label="Close modal">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12">
+                    <!-- Image Preview -->
+                    <div class="lg:col-span-7 bg-black flex items-center justify-center p-2 sm:p-4">
+                        <img id="modalImage" src="" alt="" class="max-h-[70vh] w-auto object-contain rounded-lg" />
+                    </div>
+
+                    <!-- Details Content -->
+                    <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
+                        <div>
+                            <span id="modalCategory" class="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 border border-indigo-500/20 mb-3">
+                                Category
+                            </span>
+                            <h3 id="modalTitle" class="text-2xl font-black text-slate-900 dark:text-white mb-4">
+                                Artwork Title
+                            </h3>
+                            <p id="modalDescription" class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+                                Artwork description...
+                            </p>
+
+                            <div class="space-y-3 py-4 border-y border-slate-200 dark:border-white/10 text-xs">
+                                <div>
+                                    <span class="text-slate-400 font-medium">Client / Project:</span>
+                                    <span id="modalClient" class="text-slate-800 dark:text-slate-200 font-semibold ml-2">Personal Concept</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-400 font-medium">Tools Used:</span>
+                                    <span id="modalTools" class="text-slate-800 dark:text-slate-200 font-semibold ml-2">Photoshop, Canva</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <span class="text-xs text-slate-400 font-medium block mb-2">Tags:</span>
+                                <div id="modalTags" class="flex flex-wrap gap-1.5"></div>
+                            </div>
+                        </div>
+
+                        <!-- Direct Inquiry CTA -->
+                        <div class="mt-8 pt-4 border-t border-slate-200 dark:border-white/10 flex items-center gap-3">
+                            <a id="modalInquireBtn" href="/Message" class="flex-1 py-3 px-5 text-center text-xs font-bold uppercase tracking-wider text-white bg-gradient-to-r from-indigo-600 to-cyan-500 rounded-xl hover:shadow-lg hover:shadow-indigo-500/30 transition-all">
+                                Inquire About This Style
+                            </a>
+                            <button onclick="closeDesignModal()" class="py-3 px-4 text-xs font-semibold rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!-- LOGOUT CONFIRMATION MODAL -->
+    <div id="logoutModal" class="hidden fixed inset-0 z-[100] overflow-y-auto" aria-labelledby="logoutModalTitle" role="dialog" aria-modal="true">
+        <!-- Backdrop Blur -->
+        <div class="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity" onclick="closeLogoutModal()"></div>
+        <div class="flex min-h-screen items-center justify-center p-4 text-center">
+            <div class="relative transform overflow-hidden rounded-3xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 p-6 sm:p-8 text-center shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md space-y-5">
+                <div class="w-16 h-16 mx-auto rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 flex items-center justify-center">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                </div>
+                <div class="space-y-2">
+                    <h3 id="logoutModalTitle" class="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                        Confirm Sign Out
+                    </h3>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        Are you sure you want to end your current session, <strong>@(currentUser?.FullName ?? "User")</strong>? You will need to sign in again to submit project briefs or manage designs.
+                    </p>
+                </div>
+                <div class="flex items-center gap-3 pt-2">
+                    <button type="button" onclick="closeLogoutModal()" class="w-1/2 py-3 text-xs font-bold uppercase tracking-wider rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                        Stay Signed In
+                    </button>
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="w-1/2">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="w-full py-3 text-xs font-bold uppercase tracking-wider rounded-xl text-white bg-gradient-to-r from-rose-600 to-red-500 hover:from-rose-500 hover:to-red-400 shadow-lg shadow-rose-500/30 transition-all">
+                            Yes, Sign Out
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

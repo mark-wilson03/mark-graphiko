@@ -1,0 +1,218 @@
+@model MarkGraphiko.Models.ViewModels.HomeViewModel
+@{
+    ViewData["Title"] = "MARK GRAPHIKO | Where Art Meets Design";
+}
+
+<!-- HERO SECTION -->
+<section class="relative overflow-hidden pt-8 pb-16 md:py-24">
+    <!-- Glow Background Accents -->
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-gradient-to-tr from-amber-500/15 via-indigo-600/20 to-cyan-500/15 blur-[140px] rounded-full pointer-events-none -z-10"></div>
+    <div class="absolute bottom-0 right-10 w-96 h-96 bg-purple-600/15 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex flex-col items-center text-center max-w-4xl mx-auto">
+            
+            <!-- Official Brandmark Logo Centerpiece -->
+            <div class="mb-6 reveal">
+                <img src="~/images/mark-graphiko-logo.png" alt="MARK GRAPHIKO" class="h-24 sm:h-28 w-auto mx-auto object-contain drop-shadow-[0_15px_30px_rgba(245,158,11,0.25)] hover:scale-105 transition-transform duration-500" />
+            </div>
+
+            <!-- Live Availability Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/5 dark:bg-white/5 border border-slate-300 dark:border-white/10 text-xs font-semibold text-slate-700 dark:text-slate-300 mb-6 backdrop-blur-md reveal">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Accepting Uniforms &amp; Graphic Commissions</span>
+            </div>
+
+            <!-- Brand Title & Tagline -->
+            <h1 class="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.1] uppercase mb-4 reveal reveal-delay-1">
+                MARK GRAPHIKO &bull; <span class="text-amber-500">WHERE ART MEETS DESIGN</span>
+            </h1>
+
+            <p class="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl font-normal leading-relaxed mb-8 reveal reveal-delay-2">
+                Official studio of <strong>Mark Wilson Allado</strong>. Delivering custom full-sublimation school and sports uniforms, streetwear shirt mockups, logos, and high-impact vector artwork.
+            </p>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto reveal reveal-delay-3">
+                <a asp-controller="Designs" asp-action="Index" class="w-full sm:w-auto px-8 py-4 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-gradient-to-r from-amber-500 via-indigo-600 to-cyan-500 hover:shadow-xl hover:shadow-amber-500/25 hover:-translate-y-0.5 transition-all duration-300">
+                    Explore Design Archive
+                </a>
+                <a asp-controller="Message" asp-action="Index" class="w-full sm:w-auto px-8 py-4 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white glass-panel hover:border-amber-500/50 hover:bg-slate-100/50 dark:hover:bg-slate-800/50 transition-all duration-300">
+                    Submit Uniform / Design Brief
+                </a>
+            </div>
+
+            <!-- Studio Stats Banner -->
+            <div class="grid grid-cols-3 gap-6 sm:gap-12 mt-14 pt-8 border-t border-slate-200 dark:border-white/10 w-full max-w-2xl reveal reveal-delay-4">
+                <div>
+                    <div class="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white">@Model.HappyClientsCount+</div>
+                    <div class="text-[10px] uppercase tracking-widest text-slate-500 font-mono mt-1">Apparel Clients</div>
+                </div>
+                <div>
+                    <div class="text-3xl sm:text-4xl font-black text-amber-500">300 DPI</div>
+                    <div class="text-[10px] uppercase tracking-widest text-slate-500 font-mono mt-1">Print Perfection</div>
+                </div>
+                <div>
+                    <div class="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white">@Model.YearsExperience Yrs</div>
+                    <div class="text-[10px] uppercase tracking-widest text-slate-500 font-mono mt-1">Design Mastery</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- INTERACTIVE FEATURED CAROUSEL SECTION -->
+<section class="py-16 md:py-24 border-t border-slate-200/80 dark:border-white/10 bg-slate-100/40 dark:bg-black/20">
+    <div class="max-w-7xl mx-auto px-6">
+        
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+            <div>
+                <span class="text-xs font-mono font-bold uppercase tracking-widest text-amber-500 block mb-2">Curated Portfolio</span>
+                <h2 class="text-3xl sm:text-4xl font-black uppercase text-slate-900 dark:text-white tracking-tight">
+                    FEATURED DESIGN RELEASES
+                </h2>
+            </div>
+            
+            <!-- Carousel Navigation Controls -->
+            <div class="flex items-center gap-3">
+                <button type="button" class="carousel-prev w-11 h-11 rounded-xl glass-panel flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-amber-500 hover:border-amber-500/50 transition-colors shadow-sm" aria-label="Previous slide">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <button type="button" class="carousel-next w-11 h-11 rounded-xl glass-panel flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-amber-500 hover:border-amber-500/50 transition-colors shadow-sm" aria-label="Next slide">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Carousel Container -->
+        <div id="featuredCarousel" class="relative overflow-hidden rounded-2xl">
+            <div class="carousel-track">
+                @foreach (var design in Model.FeaturedDesigns)
+                {
+                    <div class="carousel-slide px-3">
+                        <div class="portfolio-card glass-panel rounded-2xl overflow-hidden cursor-pointer group flex flex-col h-full"
+                             onclick="openDesignModal(@design.Id, '@Html.Raw(design.Title.Replace("'", "\\'"))', '@(design.Category?.Name ?? "Design")', '@design.ImagePath', '@Html.Raw(design.Description.Replace("'", "\\'"))', '@(design.Client ?? "Commission")', '@(design.ToolsUsed ?? "Photoshop, Illustrator")', '@design.Tags')">
+                            
+                            <!-- Image Box with Aspect Ratio -->
+                            <div class="relative aspect-[4/3] bg-slate-900 overflow-hidden">
+                                <img src="@design.ImagePath" alt="@design.Title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
+                                
+                                <!-- Category Pill -->
+                                <div class="absolute top-3 left-3">
+                                    <span class="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider rounded-md bg-black/60 text-white backdrop-blur-md border border-white/10">
+                                        @(design.Category?.Name ?? "Design")
+                                    </span>
+                                </div>
+
+                                <!-- View Counter -->
+                                <div class="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-md bg-black/60 text-slate-300 backdrop-blur-md">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    <span>@design.ViewCount</span>
+                                </div>
+                            </div>
+
+                            <!-- Card Body -->
+                            <div class="p-5 flex flex-col justify-between flex-grow">
+                                <div>
+                                    <h3 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-amber-500 transition-colors line-clamp-1 mb-1">
+                                        @design.Title
+                                    </h3>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                                        @design.Description
+                                    </p>
+                                </div>
+
+                                <div class="mt-4 pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-between text-xs">
+                                    <span class="text-amber-500 font-semibold group-hover:underline flex items-center gap-1">
+                                        Preview High-Res
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                    </span>
+                                    <span class="text-slate-400 font-mono text-[11px]">@(design.Client ?? "Studio Release")</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Carousel Indicators -->
+        <div class="carousel-dots flex items-center justify-center gap-2 mt-8"></div>
+
+    </div>
+</section>
+
+<!-- CATEGORY PILLARS -->
+<section class="py-20 max-w-7xl mx-auto px-6">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+        <span class="text-xs font-mono font-bold uppercase tracking-widest text-amber-500 block mb-2">Core Competencies</span>
+        <h2 class="text-3xl sm:text-4xl font-black uppercase text-slate-900 dark:text-white tracking-tight">
+            WHAT WE DESIGN
+        </h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Pillar 1 -->
+        <div class="glass-panel rounded-2xl p-8 hover:border-amber-500/40 transition-all group">
+            <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Full-Sublimation Uniforms &amp; Mockups</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                Hyper-realistic club polo shirts, sports uniforms with custom collar/placket detailing, and oversized streetwear tees.
+            </p>
+            <a asp-controller="Designs" asp-action="Index" asp-route-category="t-shirt-mockup" class="text-xs font-bold uppercase tracking-wider text-amber-500 flex items-center gap-1 group-hover:gap-2 transition-all">
+                Browse Uniforms &rarr;
+            </a>
+        </div>
+
+        <!-- Pillar 2 -->
+        <div class="glass-panel rounded-2xl p-8 hover:border-indigo-500/40 transition-all group">
+            <div class="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Modern Logos &amp; Insignias</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                Timeless monograms, brutalist emblems, and luxury brand marks calibrated for physical merchandise and digital avatars.
+            </p>
+            <a asp-controller="Designs" asp-action="Index" asp-route-category="logo-design" class="text-xs font-bold uppercase tracking-wider text-indigo-500 flex items-center gap-1 group-hover:gap-2 transition-all">
+                Browse Logos &rarr;
+            </a>
+        </div>
+
+        <!-- Pillar 3 -->
+        <div class="glass-panel rounded-2xl p-8 hover:border-cyan-500/40 transition-all group">
+            <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Intricate Vector Art</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                Infinitely scalable artwork inspired by science themes, DNA helices, mechanical gears, cyber aesthetics, and anime art.
+            </p>
+            <a asp-controller="Designs" asp-action="Index" asp-route-category="vector-art" class="text-xs font-bold uppercase tracking-wider text-cyan-500 flex items-center gap-1 group-hover:gap-2 transition-all">
+                Browse Vector Art &rarr;
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- CALL TO ACTION BANNER -->
+<section class="max-w-7xl mx-auto px-6 mb-20">
+    <div class="relative rounded-3xl overflow-hidden p-10 md:p-16 bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 border border-amber-500/30 shadow-2xl">
+        <div class="relative z-10 max-w-2xl">
+            <span class="text-xs font-mono font-bold uppercase tracking-widest text-amber-400 block mb-3">Seamless Client Collaboration</span>
+            <h2 class="text-3xl sm:text-4xl font-black text-white uppercase tracking-tight mb-4">
+                READY TO BRING YOUR UNIFORM OR DESIGN VISION TO LIFE?
+            </h2>
+            <p class="text-slate-300 text-sm leading-relaxed mb-8">
+                Connect your account via Google, Facebook, or your mobile number / email to submit a project brief, request custom quotes, and get production-ready artwork.
+            </p>
+            <a asp-controller="Message" asp-action="Index" class="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-amber-500 hover:bg-amber-400 text-slate-950 transition-colors shadow-lg shadow-amber-500/30">
+                Initiate Project Message &rarr;
+            </a>
+        </div>
+    </div>
+</section>

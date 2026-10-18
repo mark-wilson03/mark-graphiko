@@ -1,0 +1,493 @@
+@model MarkGraphiko.Models.ViewModels.ProfileViewModel
+@{
+    ViewData["Title"] = "Client Dashboard & Profile | Mark Graphiko";
+}
+
+<div class="max-w-6xl mx-auto px-6 py-12">
+    
+    <!-- Profile Header Card with Avatar Management -->
+    <div class="rounded-3xl p-8 glass-panel mb-12 shadow-xl border border-slate-200 dark:border-white/10">
+        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+            
+            <!-- Avatar with Upload Overlay -->
+            <div class="relative group w-24 h-24 rounded-3xl overflow-hidden shadow-xl shadow-indigo-500/20 shrink-0 border-2 border-indigo-500/40">
+                @if (!string.IsNullOrEmpty(Model.User.AvatarUrl))
+                {
+                    <img id="avatarPreviewImg" src="@Model.User.AvatarUrl" alt="@Model.User.FullName" class="w-full h-full object-cover" />
+                }
+                else
+                {
+                    <div id="avatarInitialsDiv" class="w-full h-full bg-gradient-to-tr from-indigo-600 to-cyan-400 flex items-center justify-center text-white font-black text-3xl">
+                        @(Model.User.FullName?.Substring(0, 1) ?? "U")
+                    </div>
+                }
+
+                <!-- Camera Upload Overlay -->
+                <label for="avatarFileInput" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white cursor-pointer transition-opacity duration-300">
+                    <svg class="w-6 h-6 mb-1 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span class="text-[9px] font-bold uppercase tracking-wider">Change</span>
+                </label>
+
+                <!-- Hidden Upload Form -->
+                <form id="avatarUploadForm" asp-action="UploadAvatar" method="post" enctype="multipart/form-data" class="hidden">
+                    @Html.AntiForgeryToken()
+                    <input type="file" id="avatarFileInput" name="avatarFile" accept="image/png, image/jpeg, image/jpg, image/webp" onchange="submitAvatarUpload(this)" />
+                </form>
+            </div>
+
+            <div class="flex-grow text-center sm:text-left">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center justify-center sm:justify-start gap-3">
+                            <h1 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                                @Model.User.FullName
+                            </h1>
+                            @if (!string.IsNullOrEmpty(Model.User.AvatarUrl) && Model.User.AvatarUrl.StartsWith("/uploads/avatars/"))
+                            {
+                                <form asp-action="RemoveAvatar" method="post" class="inline" onsubmit="return confirm('Reset profile picture back to initials monogram?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="text-[10px] text-rose-500 hover:underline font-mono" title="Remove custom avatar">
+                                        [Remove Photo]
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                        <p class="text-xs text-slate-500 font-mono mt-0.5">@Model.User.Email</p>
+                    </div>
+
+                    <div class="flex items-center justify-center gap-2">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">
+                            Connected via @Model.User.RegistrationProvider
+                        </span>
+                        <button type="button" onclick="openLogoutModal()" class="px-3 py-1.5 rounded-full text-xs font-bold text-rose-500 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            Log Out
+                        </button>
+                    </div>
+                </div>
+
+                <p class="text-sm text-slate-600 dark:text-slate-300 mt-4 leading-relaxed max-w-2xl">
+                    @(string.IsNullOrWhiteSpace(Model.User.Bio) ? "No bio provided yet. Update your profile below to tell us about your brand or apparel concepts." : Model.User.Bio)
+                </p>
+
+                <div class="flex flex-wrap items-center justify-center sm:justify-start gap-6 mt-6 pt-6 border-t border-slate-200 dark:border-white/10 text-xs text-slate-500">
+                    <div><strong>@Model.SavedFavorites.Count</strong> Saved Favorites</div>
+                    <div><strong>@Model.ActiveInquiries.Count</strong> Active Inquiries</div>
+                    <div><strong>@Model.ArchivedInquiries.Count</strong> Archived Chats</div>
+                    <div>Client Member since @Model.User.CreatedAt.ToString("MMMM yyyy")</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dual Column Layout: Left (Chats & Inquiries) | Right (Settings, Password & Favorites) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        
+        <!-- Left: Project Inquiries & Chats with Archive Tabs (7 Cols) -->
+        <div class="lg:col-span-7 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-white/10">
+                <div>
+                    <h2 class="text-xl font-bold uppercase text-slate-900 dark:text-white tracking-tight">
+                        Project Inquiries &amp; Chats
+                    </h2>
+                    <span class="text-xs text-slate-500">Archive or delete conversations as projects progress</span>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <!-- Tab Buttons -->
+                    <button type="button" onclick="switchInquiryTab('active')" id="tabBtnActive" class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-indigo-600 text-white transition-all shadow-md">
+                        Active (@Model.ActiveInquiries.Count)
+                    </button>
+                    <button type="button" onclick="switchInquiryTab('archived')" id="tabBtnArchived" class="px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider glass-panel text-slate-400 hover:text-slate-200 transition-all">
+                        Archived (@Model.ArchivedInquiries.Count)
+                    </button>
+                    <a asp-controller="Message" asp-action="Index" class="ml-2 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider text-amber-500 bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500 hover:text-white transition-all">
+                        + New
+                    </a>
+                </div>
+            </div>
+
+            <!-- TAB 1: ACTIVE INQUIRIES -->
+            <div id="tabContentActive" class="space-y-4">
+                @if (Model.ActiveInquiries.Any())
+                {
+                    @foreach (var msg in Model.ActiveInquiries)
+                    {
+                        <div class="p-6 rounded-2xl glass-panel space-y-3 border border-slate-200 dark:border-white/10 hover:border-indigo-500/40 transition-all">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <span class="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold uppercase font-mono bg-indigo-500/10 text-indigo-500 mb-1">
+                                        @msg.ProjectType
+                                    </span>
+                                    <h3 class="text-base font-bold text-slate-900 dark:text-white">
+                                        @msg.Subject
+                                    </h3>
+                                </div>
+                                <span class="text-[11px] text-slate-400 font-mono shrink-0">@msg.SentAt.ToString("MMM dd, yyyy")</span>
+                            </div>
+
+                            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-100/50 dark:bg-slate-800/40 p-3.5 rounded-xl border border-slate-200 dark:border-white/5 whitespace-pre-wrap">@msg.Content</p>
+
+                            @if (!string.IsNullOrEmpty(msg.AdminReply))
+                            {
+                                <div class="mt-3 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs">
+                                    <div class="flex items-center justify-between font-bold text-emerald-600 dark:text-emerald-400 mb-1">
+                                        <span>Mark Graphiko Studio Reply:</span>
+                                        <span class="text-[10px] font-mono font-normal">@msg.RepliedAt?.ToString("MMM dd, yyyy HH:mm")</span>
+                                    </div>
+                                    <p class="text-slate-700 dark:text-slate-200 leading-relaxed">@msg.AdminReply</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-[11px] text-amber-500 flex items-center gap-1.5 pt-1">
+                                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                                    In review by Mark Graphiko &bull; Direct quote incoming
+                                </div>
+                            }
+
+                            <!-- Inquiry Actions: Archive or Delete -->
+                            <div class="pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-end gap-2 text-xs">
+                                <form asp-action="ArchiveMessage" asp-route-id="@msg.Id" method="post" class="inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="px-3 py-1.5 rounded-lg text-xs font-semibold glass-panel text-slate-700 dark:text-slate-300 hover:text-indigo-400 hover:border-indigo-500/40 transition-colors flex items-center gap-1.5" title="Move to archive">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                                        Archive Chat
+                                    </button>
+                                </form>
+
+                                <button type="button" onclick="openChatDeleteModal(@msg.Id, '@Html.Raw(msg.Subject.Replace("'", "\\'"))')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-500 hover:bg-rose-500/10 border border-rose-500/20 transition-colors flex items-center gap-1.5" title="Delete or Archive">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    Delete...
+                                </button>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="p-8 rounded-2xl glass-panel text-center text-xs text-slate-500 space-y-2">
+                        <p>No active project inquiries.</p>
+                        <a asp-controller="Message" asp-action="Index" class="inline-block text-indigo-500 font-bold hover:underline">
+                            Start a new project brief &rarr;
+                        </a>
+                    </div>
+                }
+            </div>
+
+            <!-- TAB 2: ARCHIVED INQUIRIES -->
+            <div id="tabContentArchived" class="space-y-4 hidden">
+                @if (Model.ArchivedInquiries.Any())
+                {
+                    @foreach (var msg in Model.ArchivedInquiries)
+                    {
+                        <div class="p-6 rounded-2xl glass-panel space-y-3 opacity-90 border border-slate-200 dark:border-white/10">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <span class="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold uppercase font-mono bg-slate-500/10 text-slate-400 mb-1">
+                                        Archived &bull; @msg.ProjectType
+                                    </span>
+                                    <h3 class="text-base font-bold text-slate-800 dark:text-slate-200">
+                                        @msg.Subject
+                                    </h3>
+                                </div>
+                                <span class="text-[11px] text-slate-400 font-mono shrink-0">
+                                    Archived @(msg.ArchivedAt?.ToString("MMM dd, yyyy") ?? msg.SentAt.ToString("MMM dd, yyyy"))
+                                </span>
+                            </div>
+
+                            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed bg-slate-100/40 dark:bg-slate-800/20 p-3 rounded-xl border border-slate-200 dark:border-white/5">
+                                @msg.Content
+                            </p>
+
+                            @if (!string.IsNullOrEmpty(msg.AdminReply))
+                            {
+                                <div class="p-3 rounded-xl bg-slate-500/10 text-xs text-slate-600 dark:text-slate-300">
+                                    <span class="font-bold text-indigo-400 block mb-1">Reply Record:</span>
+                                    @msg.AdminReply
+                                </div>
+                            }
+
+                            <!-- Archive Action Controls -->
+                            <div class="pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-end gap-2 text-xs">
+                                <form asp-action="UnarchiveMessage" asp-route-id="@msg.Id" method="post" class="inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600/10 text-indigo-500 hover:bg-indigo-600 hover:text-white transition-all flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                        Restore to Active
+                                    </button>
+                                </form>
+
+                                <form asp-action="DeleteMessage" asp-route-id="@msg.Id" asp-route-permanent="true" method="post" class="inline" onsubmit="return confirm('Permanently delete this inquiry from database? This cannot be undone.');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-500 hover:bg-rose-500/10 transition-colors flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        Delete Permanently
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="p-8 rounded-2xl glass-panel text-center text-xs text-slate-500">
+                        No archived inquiries found. Use the Archive button on any active chat to safely organize it here.
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Right: Security / Password Modification & Account Settings (5 Cols) -->
+        <div class="lg:col-span-5 space-y-8">
+            
+            <!-- SECURITY & PASSWORD MODIFICATION CARD (Sends verification to Gmail) -->
+            <div class="p-6 sm:p-7 rounded-3xl glass-panel border border-slate-200 dark:border-white/10 shadow-lg space-y-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-cyan-500 text-white flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black uppercase text-slate-900 dark:text-white tracking-tight">
+                            Security &amp; Password
+                        </h3>
+                        <p class="text-[11px] text-slate-500 font-mono">Gmail 2-Step Verification Authorization</p>
+                    </div>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-slate-100/70 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    To modify your password, click below to dispatch a secure 6-digit verification code to:
+                    <strong class="text-indigo-600 dark:text-indigo-400 block mt-1 font-mono">@Model.User.Email</strong>
+                </div>
+
+                <!-- Step 1: Send Code Button -->
+                <div>
+                    <button type="button" id="btnSendPasswordCode" onclick="sendPasswordVerificationCode()" class="w-full py-2.5 px-4 text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-500/30 rounded-xl hover:bg-indigo-500 hover:text-white transition-all flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        <span id="sendCodeBtnText">Send 6-Digit Code to Gmail</span>
+                    </button>
+                    <div id="codeDispatchAlert" class="hidden mt-2 p-3 rounded-lg text-[11px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400"></div>
+                </div>
+
+                <!-- Step 2: Verification Form -->
+                <form asp-action="ChangePassword" method="post" class="space-y-3 pt-2 border-t border-slate-200 dark:border-white/10">
+                    @Html.AntiForgeryToken()
+                    <div>
+                        <label class="block text-[11px] font-mono font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
+                            6-Digit Verification Code *
+                        </label>
+                        <input name="VerificationCode" maxlength="6" placeholder="Enter code from Gmail" required
+                               class="w-full px-3 py-2 text-xs font-mono font-bold tracking-widest text-center rounded-lg glass-panel text-slate-900 dark:text-white border border-slate-300 dark:border-white/10 focus:ring-1 focus:ring-indigo-500 focus:outline-none" />
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-mono font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
+                            New Password *
+                        </label>
+                        <input name="NewPassword" type="password" placeholder="At least 6 characters" required
+                               class="w-full px-3 py-2 text-xs rounded-lg glass-panel text-slate-900 dark:text-white border border-slate-300 dark:border-white/10 focus:ring-1 focus:ring-indigo-500 focus:outline-none" />
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-mono font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
+                            Confirm New Password *
+                        </label>
+                        <input name="ConfirmPassword" type="password" placeholder="Repeat new password" required
+                               class="w-full px-3 py-2 text-xs rounded-lg glass-panel text-slate-900 dark:text-white border border-slate-300 dark:border-white/10 focus:ring-1 focus:ring-indigo-500 focus:outline-none" />
+                    </div>
+                    <button type="submit" class="w-full py-2.5 text-center text-xs font-bold uppercase tracking-wider text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-all shadow-md shadow-indigo-600/20">
+                        Update Password
+                    </button>
+                </form>
+            </div>
+
+            <!-- Profile Settings Form -->
+            <div class="p-6 rounded-2xl glass-panel border border-slate-200 dark:border-white/10">
+                <h3 class="text-sm font-bold uppercase text-slate-900 dark:text-white mb-4">Edit Profile Info</h3>
+                <form asp-action="Update" method="post" class="space-y-4">
+                    @Html.AntiForgeryToken()
+                    <div>
+                        <label class="block text-xs font-mono font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">Full Name</label>
+                        <input name="FullName" value="@Model.User.FullName" class="w-full px-3 py-2 text-xs rounded-lg glass-panel text-slate-900 dark:text-white border border-slate-300 dark:border-white/10 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">Bio / Brand Concept</label>
+                        <textarea name="Bio" rows="3" class="w-full px-3 py-2 text-xs rounded-lg glass-panel text-slate-900 dark:text-white border border-slate-300 dark:border-white/10 focus:outline-none focus:ring-1 focus:ring-indigo-500">@Model.User.Bio</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">Phone Number</label>
+                        <input name="PhoneNumber" value="@Model.User.PhoneNumber" class="w-full px-3 py-2 text-xs rounded-lg glass-panel text-slate-900 dark:text-white border border-slate-300 dark:border-white/10 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                    </div>
+                    <button type="submit" class="w-full py-2.5 text-center text-xs font-bold uppercase tracking-wider text-white bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 rounded-lg transition-colors">
+                        Save Info
+                    </button>
+                </form>
+            </div>
+
+            <!-- Saved Favorites Grid -->
+            <div>
+                <h2 class="text-lg font-bold uppercase text-slate-900 dark:text-white tracking-tight mb-3">
+                    Bookmarked Designs (@Model.SavedFavorites.Count)
+                </h2>
+
+                @if (Model.SavedFavorites.Any())
+                {
+                    <div class="grid grid-cols-2 gap-3">
+                        @foreach (var fav in Model.SavedFavorites)
+                        {
+                            <div class="glass-panel rounded-xl overflow-hidden cursor-pointer group border border-slate-200 dark:border-white/10"
+                                 onclick="openDesignModal(@fav.Id, '@Html.Raw(fav.Title.Replace("'", "\\'"))', '@(fav.Category?.Name ?? "Design")', '@fav.ImagePath', '@Html.Raw(fav.Description.Replace("'", "\\'"))', '@(fav.Client ?? "Commission")', '@(fav.ToolsUsed ?? "Photoshop, Canva")', '@fav.Tags')">
+                                <div class="aspect-square bg-slate-900 overflow-hidden">
+                                    <img src="@fav.ImagePath" alt="@fav.Title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                </div>
+                                <div class="p-2.5">
+                                    <h4 class="text-xs font-bold text-slate-900 dark:text-white line-clamp-1">@fav.Title</h4>
+                                    <span class="text-[10px] text-indigo-500 font-medium">@(fav.Category?.Name ?? "Design")</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="p-5 rounded-xl glass-panel text-center text-xs text-slate-500">
+                        Click the heart icon on any artwork in the <a asp-controller="Designs" asp-action="Index" class="text-indigo-500 font-bold hover:underline">Gallery</a> to save your favorites here.
+                    </div>
+                }
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- CHAT ARCHIVE BEFORE DELETE CONFIRMATION MODAL -->
+<div id="chatDeleteModal" class="hidden fixed inset-0 z-[100] overflow-y-auto" aria-labelledby="chatDeleteModalTitle" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity" onclick="closeChatDeleteModal()"></div>
+    <div class="flex min-h-screen items-center justify-center p-4 text-center">
+        <div class="relative transform overflow-hidden rounded-3xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 p-6 sm:p-8 text-center shadow-2xl sm:my-8 sm:w-full sm:max-w-md space-y-5">
+            <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+            </div>
+            <div class="space-y-2">
+                <h3 id="chatDeleteModalTitle" class="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                    Archive or Delete Chat?
+                </h3>
+                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    You can archive <span id="chatDeleteSubject" class="font-bold text-slate-900 dark:text-white">this inquiry</span> to keep your records safely preserved, or delete it permanently.
+                </p>
+            </div>
+
+            <div class="space-y-2.5 pt-2">
+                <!-- Option 1: Archive (Recommended) -->
+                <form id="modalArchiveForm" data-base-action="/Profile/ArchiveMessage" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="w-full py-3 text-xs font-bold uppercase tracking-wider rounded-xl text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-600/25 transition-all flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                        Archive Chat (Recommended)
+                    </button>
+                </form>
+
+                <!-- Option 2: Delete Permanently -->
+                <form id="modalPermanentDeleteForm" data-base-action="/Profile/DeleteMessage" method="post" onsubmit="return confirm('Permanently remove this inquiry from database? This cannot be undone.');">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="permanent" value="true" />
+                    <button type="submit" class="w-full py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl text-rose-500 hover:bg-rose-500/10 border border-rose-500/20 transition-all flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        Delete Permanently
+                    </button>
+                </form>
+
+                <button type="button" onclick="closeChatDeleteModal()" class="w-full py-2 text-xs text-slate-400 hover:text-slate-200">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // 1. Instant Avatar Upload on file selection
+    function submitAvatarUpload(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File size exceeds 10MB limit.');
+                return;
+            }
+            document.getElementById('avatarUploadForm').submit();
+        }
+    }
+
+    // 2. Tab switching between Active and Archived inquiries
+    function switchInquiryTab(tab) {
+        const btnActive = document.getElementById('tabBtnActive');
+        const btnArchived = document.getElementById('tabBtnArchived');
+        const contentActive = document.getElementById('tabContentActive');
+        const contentArchived = document.getElementById('tabContentArchived');
+
+        if (tab === 'active') {
+            btnActive.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-indigo-600 text-white transition-all shadow-md';
+            btnArchived.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider glass-panel text-slate-400 hover:text-slate-200 transition-all';
+            contentActive.classList.remove('hidden');
+            contentArchived.classList.add('hidden');
+        } else {
+            btnArchived.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-indigo-600 text-white transition-all shadow-md';
+            btnActive.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider glass-panel text-slate-400 hover:text-slate-200 transition-all';
+            contentArchived.classList.remove('hidden');
+            contentActive.classList.add('hidden');
+        }
+    }
+
+    // 3. Send 6-digit password verification code to Gmail
+    async function sendPasswordVerificationCode() {
+        const btn = document.getElementById('btnSendPasswordCode');
+        const btnText = document.getElementById('sendCodeBtnText');
+        const alertBox = document.getElementById('codeDispatchAlert');
+
+        btn.disabled = true;
+        btnText.textContent = 'Sending Code to Gmail...';
+
+        try {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            const response = await fetch('/Profile/SendPasswordCode', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': token || ''
+                },
+                body: '__RequestVerificationToken=' + encodeURIComponent(token || '')
+            });
+
+            const data = await response.json();
+            alertBox.classList.remove('hidden');
+            alertBox.textContent = data.message;
+            if (data.success) {
+                alertBox.className = 'mt-2 p-3 rounded-lg text-[11px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400';
+                btnText.textContent = 'Code Sent to Gmail! (Resend in 60s)';
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btnText.textContent = 'Resend Code to Gmail';
+                }, 60000);
+            } else {
+                alertBox.className = 'mt-2 p-3 rounded-lg text-[11px] bg-rose-500/10 border border-rose-500/30 text-rose-500';
+                btn.disabled = false;
+                btnText.textContent = 'Send 6-Digit Code to Gmail';
+            }
+        } catch (err) {
+            btn.disabled = false;
+            btnText.textContent = 'Send 6-Digit Code to Gmail';
+            alertBox.classList.remove('hidden');
+            alertBox.className = 'mt-2 p-3 rounded-lg text-[11px] bg-rose-500/10 border border-rose-500/30 text-rose-500';
+            alertBox.textContent = 'Network error sending code. Please check your connection and try again.';
+        }
+    }
+</script>
+}

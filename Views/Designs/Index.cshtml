@@ -1,0 +1,120 @@
+@model MarkGraphiko.Models.ViewModels.DesignsViewModel
+@{
+    ViewData["Title"] = "Design Archive & Portfolio Gallery";
+}
+
+<div class="max-w-7xl mx-auto px-6 py-10 md:py-16">
+    
+    <!-- Gallery Header & Tagline -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-8 border-b border-slate-200 dark:border-white/10">
+        <div>
+            <span class="text-xs font-mono font-bold uppercase tracking-widest text-indigo-500 dark:text-indigo-400 block mb-2">Portfolio Showcase</span>
+            <h1 class="text-3xl sm:text-5xl font-black uppercase text-slate-900 dark:text-white tracking-tight">
+                DESIGN ARCHIVE
+            </h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 max-w-xl">
+                Browse our complete collection of custom apparel mockups, vector artwork, brandmarks, and typography.
+            </p>
+        </div>
+
+        <!-- Real-Time Search Bar -->
+        <div class="w-full md:w-80">
+            <div class="relative">
+                <input type="text" id="gallerySearch" value="@Model.SearchQuery" placeholder="Search artwork, tags, client..."
+                       class="w-full px-4 py-3 pl-10 text-xs rounded-xl glass-panel text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-slate-300 dark:border-white/10 transition-all" />
+                <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Filter Buttons Bar -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-4 mb-10 no-scrollbar">
+        <button type="button" data-slug="all" class="gallery-filter-btn shrink-0 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all @(Model.SelectedCategorySlug == "all" ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30" : "bg-slate-200/60 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700")">
+            All Works (@Model.TotalCount)
+        </button>
+        @foreach (var cat in Model.Categories)
+        {
+            <button type="button" data-slug="@cat.Slug" class="gallery-filter-btn shrink-0 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all @(Model.SelectedCategorySlug == cat.Slug ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30" : "bg-slate-200/60 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700")">
+                @cat.Name
+            </button>
+        }
+    </div>
+
+    <!-- Gallery Grid -->
+    <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        @foreach (var design in Model.Designs)
+        {
+            var isFav = Model.UserFavoriteDesignIds.Contains(design.Id);
+            <div class="gallery-card portfolio-card glass-panel rounded-2xl overflow-hidden group flex flex-col justify-between"
+                 data-category="@(design.Category?.Slug ?? "")"
+                 data-search="@design.Title @design.Description @design.Tags @design.Client @(design.Category?.Name ?? "")">
+                
+                <!-- Image Wrapper with Click to Open Modal -->
+                <div class="relative aspect-[4/3] bg-slate-900 overflow-hidden cursor-pointer"
+                     onclick="openDesignModal(@design.Id, '@Html.Raw(design.Title.Replace("'", "\\'"))', '@(design.Category?.Name ?? "Design")', '@design.ImagePath', '@Html.Raw(design.Description.Replace("'", "\\'"))', '@(design.Client ?? "Commission")', '@(design.ToolsUsed ?? "Photoshop, Illustrator")', '@design.Tags')">
+                    
+                    <img src="@design.ImagePath" alt="@design.Title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-75 group-hover:opacity-90 transition-opacity"></div>
+
+                    <!-- Category Badge -->
+                    <div class="absolute top-3 left-3">
+                        <span class="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider rounded-md bg-black/60 text-white backdrop-blur-md border border-white/10">
+                            @(design.Category?.Name ?? "Design")
+                        </span>
+                    </div>
+
+                    <!-- Favorite Button (AJAX) -->
+                    <button type="button" onclick="event.stopPropagation(); toggleFavorite(@design.Id, this)"
+                            class="absolute top-3 right-3 p-2 rounded-xl bg-black/60 backdrop-blur-md transition-colors @(isFav ? "text-rose-500" : "text-slate-400 hover:text-rose-400")"
+                            title="Save to Favorites" aria-label="Favorite">
+                        <svg class="w-4 h-4" fill="@(isFav ? "currentColor" : "none")" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Card Details -->
+                <div class="p-5 flex flex-col justify-between flex-grow">
+                    <div>
+                        <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono mb-1">
+                            <span>@(design.Client ?? "Studio Edition")</span>
+                            <span>@design.CreatedAt.ToString("MMM yyyy")</span>
+                        </div>
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-500 transition-colors line-clamp-1 mb-1.5 cursor-pointer"
+                            onclick="openDesignModal(@design.Id, '@Html.Raw(design.Title.Replace("'", "\\'"))', '@(design.Category?.Name ?? "Design")', '@design.ImagePath', '@Html.Raw(design.Description.Replace("'", "\\'"))', '@(design.Client ?? "Commission")', '@(design.ToolsUsed ?? "Photoshop, Illustrator")', '@design.Tags')">
+                            @design.Title
+                        </h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                            @design.Description
+                        </p>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-between text-xs">
+                        <button type="button"
+                                onclick="openDesignModal(@design.Id, '@Html.Raw(design.Title.Replace("'", "\\'"))', '@(design.Category?.Name ?? "Design")', '@design.ImagePath', '@Html.Raw(design.Description.Replace("'", "\\'"))', '@(design.Client ?? "Commission")', '@(design.ToolsUsed ?? "Photoshop, Illustrator")', '@design.Tags')"
+                                class="text-indigo-500 dark:text-indigo-400 font-semibold hover:underline flex items-center gap-1">
+                            View Details
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </button>
+                        <a asp-controller="Message" asp-action="Index" asp-route-designId="@design.Id" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-medium">
+                            Inquire &rarr;
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
+
+    <!-- Empty State -->
+    <div id="galleryEmptyState" class="hidden text-center py-20">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-slate-200 dark:bg-slate-800 text-slate-400 flex items-center justify-center mb-4">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">No Designs Found</h3>
+        <p class="text-xs text-slate-500">Try adjusting your search query or selecting a different category filter.</p>
+    </div>
+
+</div>

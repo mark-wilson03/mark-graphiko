@@ -1,0 +1,162 @@
+@model List<MarkGraphiko.Models.Message>
+@{
+    ViewData["Title"] = "Client Inquiries Inbox | Mark Graphiko Admin";
+    var activeFilter = ViewData["ActiveFilter"]?.ToString() ?? "all";
+}
+
+<div class="max-w-6xl mx-auto px-6 py-12">
+    
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-slate-200 dark:border-white/10">
+        <div>
+            <span class="text-xs font-mono font-bold uppercase tracking-widest text-indigo-500 block mb-1">Direct Communications</span>
+            <h1 class="text-2xl sm:text-3xl font-black uppercase text-slate-900 dark:text-white">
+                Client Inquiries Inbox
+            </h1>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+            <a asp-action="Messages" asp-route-filter="all" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider @(activeFilter == "all" ? "bg-indigo-600 text-white" : "glass-panel text-slate-400 hover:text-white")">
+                Active Inbox
+            </a>
+            <a asp-action="Messages" asp-route-filter="unread" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider @(activeFilter == "unread" ? "bg-amber-500 text-white" : "glass-panel text-slate-400 hover:text-white")">
+                Unread Only
+            </a>
+            <a asp-action="Messages" asp-route-filter="archived" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider @(activeFilter == "archived" ? "bg-purple-600 text-white" : "glass-panel text-slate-400 hover:text-white")">
+                Archived
+            </a>
+        </div>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="space-y-6">
+            @foreach (var msg in Model)
+            {
+                <div class="p-6 sm:p-8 rounded-3xl glass-panel @(!msg.IsRead ? "border-l-4 border-l-amber-500" : "") space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-700 dark:text-slate-300 text-sm">
+                                @msg.SenderName.Substring(0, 1)
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-slate-900 dark:text-white">
+                                    @msg.SenderName
+                                </h3>
+                                <div class="flex items-center gap-2 text-xs text-slate-400 font-mono">
+                                    <a href="mailto:@msg.SenderEmail" class="hover:text-indigo-400 underline">@msg.SenderEmail</a>
+                                    @if (!string.IsNullOrEmpty(msg.PhoneNumber))
+                                    {
+                                        <span>&bull; @msg.PhoneNumber</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <span class="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold uppercase bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">
+                                @msg.ProjectType
+                            </span>
+                            <span class="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold uppercase bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                                @msg.BudgetRange
+                            </span>
+                            <span class="text-xs text-slate-400 font-mono">
+                                @msg.SentAt.ToString("MMM dd, yyyy HH:mm")
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Subject & Content -->
+                    <div class="pt-2">
+                        <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-2">@msg.Subject</h4>
+                        <div class="p-4 rounded-xl bg-slate-100/60 dark:bg-slate-800/40 text-xs text-slate-700 dark:text-slate-300 leading-relaxed border border-slate-200 dark:border-white/5 whitespace-pre-wrap">@msg.Content</div>
+                    </div>
+
+                    <!-- Existing Reply Display -->
+                    @if (!string.IsNullOrEmpty(msg.AdminReply))
+                    {
+                        <div class="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs">
+                            <div class="flex items-center justify-between font-bold text-indigo-500 dark:text-indigo-400 mb-1">
+                                <span>Sent Reply (Dispatched via Email):</span>
+                                <span class="text-[10px] font-mono font-normal">@msg.RepliedAt?.ToString("MMM dd, yyyy HH:mm")</span>
+                            </div>
+                            <p class="text-slate-700 dark:text-slate-200 leading-relaxed">@msg.AdminReply</p>
+                        </div>
+                    }
+
+                    <!-- Admin Action & Reply Form -->
+                    <div class="pt-3 border-t border-slate-200 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-center gap-2">
+                            @if (!msg.IsRead)
+                            {
+                                <form asp-action="MarkRead" asp-route-id="@msg.Id" method="post" class="inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-white transition-colors">
+                                        Mark as Read
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="text-[11px] text-slate-400 font-mono mr-2">Status: Read</span>
+                            }
+
+                            @if (!msg.IsArchived)
+                            {
+                                <form asp-action="ArchiveMessage" asp-route-id="@msg.Id" method="post" class="inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="px-3 py-1.5 text-xs font-semibold rounded-lg glass-panel text-slate-700 dark:text-slate-300 hover:text-indigo-400 transition-colors">
+                                        Archive
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="UnarchiveMessage" asp-route-id="@msg.Id" method="post" class="inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600/10 text-indigo-500 hover:bg-indigo-600 hover:text-white transition-colors">
+                                        Restore to Active
+                                    </button>
+                                </form>
+                            }
+
+                            <form asp-action="DeleteMessage" asp-route-id="@msg.Id" method="post" class="inline" onsubmit="return confirm('Permanently delete this inquiry from the database?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="px-3 py-1.5 text-xs font-semibold rounded-lg text-rose-500 hover:bg-rose-500/10 transition-colors">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+
+                        <details class="group">
+                            <summary class="cursor-pointer text-xs font-bold text-indigo-500 hover:underline list-none flex items-center gap-1">
+                                <span>@(string.IsNullOrEmpty(msg.AdminReply) ? "Reply to Client" : "Send Another Reply")</span>
+                                <svg class="w-4 h-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </summary>
+                            <div class="mt-4 p-4 rounded-2xl glass-panel">
+                                <form asp-action="Reply" method="post" class="space-y-3">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="MessageId" value="@msg.Id" />
+                                    <textarea name="ReplyContent" rows="3" placeholder="Type your response or quote details to send directly to @msg.SenderEmail..."
+                                              class="w-full px-3 py-2 text-xs rounded-xl glass-panel text-slate-900 dark:text-white border border-slate-300 dark:border-white/10 focus:outline-none focus:ring-1 focus:ring-indigo-500"></textarea>
+                                    <div class="flex justify-end">
+                                        <button type="submit" class="px-4 py-2 text-xs font-bold uppercase tracking-wider text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-sm">
+                                            Send Email Reply &rarr;
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </details>
+                    </div>
+
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="p-12 rounded-3xl glass-panel text-center text-xs text-slate-400">
+            No inquiries found in this view.
+        </div>
+    }
+
+</div>
