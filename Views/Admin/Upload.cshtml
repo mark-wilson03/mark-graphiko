@@ -51,15 +51,15 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <!-- Title -->
                 <div>
-                    <label asp-for="Title" class="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">Artwork Title *</label>
-                    <input asp-for="Title" placeholder="e.g. CYBER HEAVYWEIGHT OVERSIZED TEE"
+                    <label asp-for="Title" class="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">Artwork Title</label>
+                    <input asp-for="Title" placeholder="e.g. ORGANIZATION CLUB UNIFORM"
                            class="w-full px-4 py-3 rounded-xl glass-panel text-slate-900 dark:text-white border border-slate-300 dark:border-white/10 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
                     <span asp-validation-for="Title" class="text-[11px] text-rose-500"></span>
                 </div>
 
                 <!-- Category -->
                 <div>
-                    <label asp-for="CategoryId" class="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">Category *</label>
+                    <label asp-for="CategoryId" class="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">Category</label>
                     <select asp-for="CategoryId" asp-items="Model.CategoryOptions"
                             class="w-full px-4 py-3 rounded-xl glass-panel text-slate-900 dark:text-white bg-transparent border border-slate-300 dark:border-white/10 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                     </select>
@@ -70,14 +70,14 @@
                 <!-- Client / Project -->
                 <div>
                     <label asp-for="Client" class="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">Client / Commission (Optional)</label>
-                    <input asp-for="Client" placeholder="e.g. Tokyo Street Club"
+                    <input asp-for="Client" placeholder="e.g. Mark Wilson Allado"
                            class="w-full px-4 py-3 rounded-xl glass-panel text-slate-900 dark:text-white border border-slate-300 dark:border-white/10 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
                 </div>
 
                 <!-- Tools Used -->
                 <div>
                     <label asp-for="ToolsUsed" class="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">Tools Used</label>
-                    <input asp-for="ToolsUsed" placeholder="Adobe Photoshop, Illustrator"
+                    <input asp-for="ToolsUsed" placeholder="Adobe Photoshop"
                            class="w-full px-4 py-3 rounded-xl glass-panel text-slate-900 dark:text-white border border-slate-300 dark:border-white/10 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
                 </div>
             </div>

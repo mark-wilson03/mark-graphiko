@@ -377,12 +377,21 @@ public class AccountController : Controller
     }
 
     [HttpGet]
-    public IActionResult Logout()
+    public async Task<IActionResult> Logout()
     {
         if (User.Identity?.IsAuthenticated != true)
         {
             return RedirectToAction("Index", "Home");
         }
+
+        if (string.Equals(Request.Query["confirm"], "true", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(Request.Query["confirm"], "yes", StringComparison.OrdinalIgnoreCase))
+        {
+            await _signInManager.SignOutAsync();
+            TempData["SuccessMessage"] = "You have been signed out safely.";
+            return RedirectToAction("Index", "Home");
+        }
+
         return View();
     }
 

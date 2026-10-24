@@ -111,27 +111,25 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
                         <label asp-for="ProjectType" class="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-                            Project Type *
+                            Project Type
                         </label>
                         <select asp-for="ProjectType" class="w-full px-4 py-3 rounded-xl glass-panel text-slate-900 dark:text-white bg-transparent border border-slate-300 dark:border-white/10 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            <option value="Full Sublimation Polo Uniform" class="dark:bg-slate-900">Full Sublimation Polo / Sports Uniform</option>
-                            <option value="T-Shirt Mockup &amp; Apparel" class="dark:bg-slate-900">T-Shirt Mockup &amp; Streetwear Apparel</option>
+                            <option value="Full Sublimation Polo Uniform" class="dark:bg-slate-900">Polo Shirt Mockup Uniform</option>
+                            <option value="T-Shirt Mockup &amp; Apparel" class="dark:bg-slate-900">T-Shirt Mockup Design &amp; Apparel</option>
                             <option value="Logo &amp; Brand Kit" class="dark:bg-slate-900">Logo &amp; Brand Kit</option>
                             <option value="Vector Art &amp; Illustration" class="dark:bg-slate-900">Vector Art &amp; Illustration</option>
-                            <option value="Branding &amp; Packaging" class="dark:bg-slate-900">Branding &amp; Packaging</option>
-                            <option value="Other / Full Retainer" class="dark:bg-slate-900">Other / Retainer</option>
+                            <option value="Branding &amp; Poster" class="dark:bg-slate-900">Branding &amp; Poster</option>
+                            <option value="Other" class="dark:bg-slate-900">Other</option>
                         </select>
                     </div>
 
                     <div>
                         <label asp-for="BudgetRange" class="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-                            Estimated Budget *
+                            Estimated Budget
                         </label>
                         <select asp-for="BudgetRange" class="w-full px-4 py-3 rounded-xl glass-panel text-slate-900 dark:text-white bg-transparent border border-slate-300 dark:border-white/10 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            <option value="$100 - $300" class="dark:bg-slate-900">$100 - $300 (Single Mockup/Design)</option>
-                            <option value="$300 - $600" class="dark:bg-slate-900">$300 - $600 (Uniform Set / 2-3 Graphics)</option>
-                            <option value="$600 - $1,200" class="dark:bg-slate-900">$600 - $1,200 (Full Brand Kit or Team Uniforms)</option>
-                            <option value="$1,200+" class="dark:bg-slate-900">$1,200+ (Bulk Uniform Production / Enterprise)</option>
+                            <option value="$100 - $300" class="dark:bg-slate-900">₱100 - ₱200 (Single Mockup/Design)</option>
+                            <option value="$300 - $600" class="dark:bg-slate-900">₱300 - ₱600 (Uniform Set / 2-3 Graphics)</option>
                         </select>
                     </div>
                 </div>
@@ -139,9 +137,9 @@
                 <!-- Subject Line -->
                 <div>
                     <label asp-for="Subject" class="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-                        Subject Line *
+                        Subject Line
                     </label>
-                    <input asp-for="Subject" placeholder="e.g. Science Club Sublimation Polo Uniforms - 45 Sets"
+                    <input asp-for="Subject" placeholder="e.g. Science Club Sublimation Polo Uniform"
                            class="w-full px-4 py-3 rounded-xl glass-panel text-slate-900 dark:text-white placeholder-slate-400 border border-slate-300 dark:border-white/10 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
                     <span asp-validation-for="Subject" class="text-[11px] text-rose-500 block mt-1"></span>
                 </div>
@@ -149,7 +147,7 @@
                 <!-- Phone (Optional) -->
                 <div>
                     <label asp-for="PhoneNumber" class="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-                        WhatsApp / Contact Phone (Optional)
+                        Email / Contact Phone (Optional)
                     </label>
                     <input asp-for="PhoneNumber" placeholder="+63 912 345 6789"
                            class="w-full px-4 py-3 rounded-xl glass-panel text-slate-900 dark:text-white placeholder-slate-400 border border-slate-300 dark:border-white/10 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
@@ -158,7 +156,7 @@
                 <!-- Project Content / Brief -->
                 <div>
                     <label asp-for="Content" class="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-                        Project Brief &amp; Specifications *
+                        Project Brief &amp; Specifications
                     </label>
                     <textarea asp-for="Content" rows="6" placeholder="Describe your uniform specifications, preferred colors (e.g. purple, black, white), logos or emblems to include, target delivery timeline, or any specific visual references..."
                               class="w-full px-4 py-3 rounded-xl glass-panel text-slate-900 dark:text-white placeholder-slate-400 border border-slate-300 dark:border-white/10 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none leading-relaxed"></textarea>
@@ -167,7 +165,7 @@
 
                 <!-- Submit Button -->
                 <button type="submit" class="w-full py-4 text-center text-xs font-bold uppercase tracking-wider text-white bg-gradient-to-r from-amber-500 via-indigo-600 to-cyan-500 rounded-xl hover:shadow-xl hover:shadow-amber-500/25 hover:scale-[1.01] transition-all duration-300">
-                    Dispatch Project Brief to Mark Graphiko &rarr;
+                    Send to Mark Graphiko &rarr;
                 </button>
             </form>
         </div>
